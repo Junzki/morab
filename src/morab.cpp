@@ -3,9 +3,6 @@
 
 #include "morab.h"
 
-#ifdef WIN32
-#include "wgetopt.hpp"
-#endif
 
 int main(const int argc, char* argv[])
 {
@@ -18,7 +15,7 @@ int main(const int argc, char* argv[])
         {
 		case 'c':
 			path = std::string(optarg);
-			takeout::config::get_instance().read(path);
+			takeout::morab::object().setup(path);
 			std::cout << "Loaded config file from: " << path << std::endl;
 
 			break;
@@ -27,10 +24,10 @@ int main(const int argc, char* argv[])
         }
 	}
 
-	std::cout << takeout::config::get_instance().proxy_address() << std::endl;
+	std::cout << takeout::morab::object().settings().proxy_address() << std::endl;
 
     const std::string url = "http://t66y.com/htm_mob/2101/8/4271499.html";
-	const auto res = takeout::get_html(url);
+	const auto res = takeout::morab::object().get_html(url);
 	auto results = takeout::extract_images(res);
 
 	const auto fn = takeout::extract_filename_from_url(url, true);
@@ -43,7 +40,7 @@ int main(const int argc, char* argv[])
 		const auto name = takeout::extract_filename_from_url(image_url);
 		const auto joined = takeout::combine_path(fn, name);
 
-		takeout::download(image_url, joined);
+		takeout::morab::object().download(image_url, joined);
 		std::cout << "Downloaded: " << image_url << std::endl;
 	}
 

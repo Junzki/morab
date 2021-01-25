@@ -6,76 +6,49 @@
 #ifndef MORAB_H
 #define MORAB_H
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <nlohmann/json.hpp>
-
-#ifdef WIN32
-#include <Windows.h>
-#include <Shlwapi.h>
-#endif
+#include "stdafx.h"
+#include "config.h"
 
 namespace takeout
 {
-    using json = nlohmann::json;
 
-    class config
+    class morab
     {
     public:
-        config(config& other) = delete;
-        void operator=(const config&) = delete;
+        ~morab() = default;
+        morab(morab&) = delete;
+        void operator=(const morab&) = delete;
 
-        ~config() = default;
-
-        static config& get_instance()
+        static morab& object()
         {
-            static config instance;
-
+            static morab instance;
             return instance;
         }
 
-        void read(const std::string& path)
+        void setup(const std::string& path)
         {
-            std::ifstream f;
-            f.open(path, std::ios::in);
-
-            if (!f.is_open()) return;
-
-            std::ostringstream ss;
-            ss << f.rdbuf();
-
-            auto parsed = json::parse(ss.str());
-            this->proxy_ = parsed["proxy"];
-            this->proxy_address_ = parsed["proxy_address"];
-            //this->target_dir_ = parsed["target_dir"];
+            this->config_.read(path);
         }
 
-        auto proxy() const { return this->proxy_; }
-        auto proxy_address() const { return this->proxy_address_; }
-        auto user_agent() const { return this->user_agent_; }
-        auto target_dir() const
+        config settings() const
         {
-            if (! this->target_dir_.empty())
-                return this->target_dir_;
-
-            return std::string();
+            return this->config_;
         }
+
+        
+        std::string get_html(const std::string&) const;
+        void download(const std::string&, const std::string&) const;
 
     protected:
-        config() = default;
+        cURLpp::Easy* build_requester() const;
 
-        bool proxy_ = false;
-        std::string proxy_address_;
-        std::string user_agent_ = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
-        std::string target_dir_;
+    private:
+        morab() = default;
+
+        config config_;
+
     };
 
-
-
-    auto get_html(const std::string&) -> std::string;
-    void download(const std::string&, const std::string&);
 
     auto extract_images(const std::string&) -> std::vector<std::string>;
 

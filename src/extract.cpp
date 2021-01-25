@@ -1,8 +1,7 @@
 
-#include <algorithm>
+
 #include "morab.h"
-#include "libxml/HTMLparser.h"
-#include "libxml/tree.h"
+
 
 const auto* target_tag  = (const xmlChar*)"img";
 const auto* target_attr = (const xmlChar*)"ess-data";

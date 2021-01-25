@@ -6,9 +6,9 @@ cmake_minimum_required (VERSION 3.8)
 project ("morab" CXX)
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include")
 
-set(${PROJECT_NAME}_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(${PROJECT_NAME}_SOURCE "${PROJECT_SOURCE_DIR}/src")
 file(GLOB_RECURSE ${PROJECT_NAME}_FILES "${${PROJECT_NAME}_SOURCE}/*.cpp")
 
 find_package(unofficial-curlpp CONFIG REQUIRED)

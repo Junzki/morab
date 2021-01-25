@@ -1,49 +1,52 @@
 
-
-#include "curlpp/cURLpp.hpp"
-#include "curlpp/Easy.hpp"
-#include "curlpp/Options.hpp"
-
 #include "morab.h"
 
-auto
-takeout::get_html(const std::string& url) -> std::string
+
+cURLpp::Easy*
+takeout::morab::build_requester() const
 {
-    curlpp::Easy request;
-    auto* out_stream = new std::ostringstream();
+    auto* request = new cURLpp::Easy();
 
-    request.setOpt(new curlpp::options::Url(url));
+    request->setOpt(new curlpp::options::UserAgent(this->config_.user_agent()));
+    if (this->config_.proxy())
+        request->setOpt(new cURLpp::options::Proxy(this->config_.proxy_address()));
 
-    request.setOpt(new curlpp::options::UserAgent(config::get_instance().user_agent()));
-    request.setOpt(new curlpp::options::WriteStream(out_stream));
+    return request;
+}
 
-    if (config::get_instance().proxy())
-        request.setOpt(new curlpp::options::Proxy(config::get_instance().proxy_address()));
 
-    request.perform();
+std::string
+takeout::morab::get_html(const std::string& url) const
+{
+    auto* req = this->build_requester();
+    std::ostringstream out_stream;
 
-    auto response = out_stream->str();
+    req->setOpt(new curlpp::options::Url(url));
+    req->setOpt(new curlpp::options::WriteStream(&out_stream));
+
+    req->perform();
+
+    auto response = out_stream.str();
+
+    delete req;
     return response;
 }
 
 
 void
-takeout::download(const std::string& url, const std::string& path)
+takeout::morab::download(const std::string& url, const std::string& path) const
 {
-    curlpp::Easy request;
+    auto* req = this->build_requester();
 
     std::ofstream f;
     f.open(path, std::ios::out | std::ios::binary);
     if (!f.is_open()) return;
 
-    request.setOpt(new curlpp::options::Url(url));
-
-    request.setOpt(new curlpp::options::UserAgent(config::get_instance().user_agent()));
-    request.setOpt(new curlpp::options::WriteStream(&f));
-
-    if (config::get_instance().proxy())
-        request.setOpt(new curlpp::options::Proxy(config::get_instance().proxy_address()));
-
-    request.perform();
+    req->setOpt(new curlpp::options::Url(url));
+    req->setOpt(new curlpp::options::WriteStream(&f));
+    
+    req->perform();
     f.close();
+
+    delete req;
 }
