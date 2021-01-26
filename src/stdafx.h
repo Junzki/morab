@@ -30,6 +30,11 @@
 #include "wgetopt.hpp"
 #endif
 
+#if defined(unix) || defined(__APPLE__) || defined(__linux__)
+#define __GENERIC_UNIX__
+#include <unistd.h>
+#endif
+
 // cURLpp
 #include "curlpp/cURLpp.hpp"
 #include "curlpp/Easy.hpp"
@@ -39,8 +44,6 @@
 #include "libxml/HTMLparser.h"
 #include "libxml/tree.h"
 
-
-
-#endif
+#endif // !MORAB_STDAFX_H
 
 #pragma warning(pop)

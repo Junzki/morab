@@ -12,6 +12,12 @@ set(${PROJECT_NAME}_SOURCE "${PROJECT_SOURCE_DIR}/src")
 file(GLOB_RECURSE ${PROJECT_NAME}_FILES "${${PROJECT_NAME}_SOURCE}/*.cpp")
 
 find_package(unofficial-curlpp CONFIG REQUIRED)
+# vcpkg may not add installed libraries to include_directories
+# add them explicitly.
+find_path(VCPKG_INCLUDE_DIR curlpp)
+include_directories(${VCPKG_INCLUDE_DIR})
+message("-- Added vcpkg include directory: ${VCPKG_INCLUDE_DIR}")
+
 find_package(LibXml2 REQUIRED)
 include_directories(${LIBXML2_INCLUDE_DIR})
 
@@ -24,7 +30,7 @@ endif()
 set(TARGET_BINARY "morab")
 
 add_executable(${TARGET_BINARY} ${${PROJECT_NAME}_FILES})
-target_link_libraries(${TARGET_BINARY} ${TARGET_LIBRARIES})
+target_link_libraries(${TARGET_BINARY} PRIVATE ${TARGET_LIBRARIES})
 
 # Tests
 if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
