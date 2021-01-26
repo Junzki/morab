@@ -8,6 +8,7 @@
 
 #include "stdafx.h"
 #include "config.h"
+#include "workers.h"
 
 namespace takeout
 {
