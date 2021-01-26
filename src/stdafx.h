@@ -21,16 +21,12 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <thread>
-#include <mutex>
-#include <queue>
 
 #include <nlohmann/json.hpp>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <Shlwapi.h>
-#include "wgetopt.hpp"
 #endif
 
 #if defined(unix) || defined(__APPLE__) || defined(__linux__)
@@ -46,6 +42,10 @@
 // LibXml
 #include "libxml/HTMLparser.h"
 #include "libxml/tree.h"
+
+// Thread Pool
+#define THREAD_POOL_NAMESPACE_NAME takeout
+#include "thread_pool/thread_pool.hpp"
 
 #endif // !MORAB_STDAFX_H
 

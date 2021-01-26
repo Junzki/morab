@@ -3,6 +3,10 @@
 
 #include "morab.h"
 
+#ifdef _WIN32
+#include "wgetopt.hpp"
+#endif
+
 
 int main(const int argc, char* argv[])
 {

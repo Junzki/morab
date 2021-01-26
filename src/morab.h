@@ -1,6 +1,4 @@
-﻿// takeout.h : Include file for standard system include files,
-// or project specific include files.
-
+﻿
 #pragma once
 
 #ifndef MORAB_H
@@ -8,7 +6,6 @@
 
 #include "stdafx.h"
 #include "config.h"
-#include "workers.h"
 
 namespace takeout
 {
@@ -16,10 +13,6 @@ namespace takeout
     class morab
     {
     public:
-        ~morab() = default;
-        morab(morab&) = delete;
-        void operator=(const morab&) = delete;
-
         static morab& object()
         {
             static morab instance;
@@ -36,9 +29,16 @@ namespace takeout
             return this->config_;
         }
 
-        
         std::string get_html(const std::string&) const;
         void download(const std::string&, const std::string&) const;
+
+        ~morab() = default;
+
+        morab(morab&) = delete;
+        void operator=(const morab&) = delete;
+
+        morab(morab&&) = delete;
+        morab& operator=(const morab&&) = delete;
 
     protected:
         cURLpp::Easy* build_requester() const;
@@ -47,7 +47,7 @@ namespace takeout
         morab() = default;
 
         config config_;
-
+        ThreadPool pool_;
     };
 
 
