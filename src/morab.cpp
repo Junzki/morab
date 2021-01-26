@@ -44,8 +44,13 @@ int main(const int argc, char* argv[])
 		const auto name = takeout::extract_filename_from_url(image_url);
 		const auto joined = takeout::combine_path(fn, name);
 
-		takeout::morab::object().download(image_url, joined);
-		std::cout << "Downloaded: " << image_url << std::endl;
+		auto future = takeout::morab::object().pool.submit([](const std::string url_, const std::string path_)
+		{
+		    takeout::morab::object().download(url_, path_);
+			std::cout << "Downloaded: " << url_ << std::endl;
+		}, image_url, joined);
+
+		// TODO: Wait futures.
 	}
 
 	return 0;

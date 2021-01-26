@@ -32,6 +32,8 @@ namespace takeout
         std::string get_html(const std::string&) const;
         void download(const std::string&, const std::string&) const;
 
+        ThreadPool pool;
+
         ~morab() = default;
 
         morab(morab&) = delete;
@@ -45,9 +47,7 @@ namespace takeout
 
     private:
         morab() = default;
-
         config config_;
-        ThreadPool pool_;
     };
 
 

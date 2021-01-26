@@ -39,6 +39,12 @@ takeout::morab::download(const std::string& url, const std::string& path) const
     auto* req = this->build_requester();
 
     std::ofstream f;
+
+    // TODO:
+    //  If separated filename has no extension,
+    // try to guess the extension from MIMEType
+    // and rename generated file.
+
     f.open(path, std::ios::out | std::ios::binary);
     if (!f.is_open()) return;
 
