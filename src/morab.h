@@ -52,8 +52,8 @@ namespace takeout
 
     auto extract_images(const std::string&) -> std::vector<std::string>;
 
-    std::string extract_filename_from_url(const std::string& in, const bool remove_ext = false);
-    void mkdir(const std::string& path, const bool exist_ok = false);
+    std::string extract_filename_from_url(const std::string& in, bool remove_ext = false);
+    void mkdir(const std::string& path, bool exist_ok = false);
     std::string combine_path(const std::string&, const std::string&);
 }
 

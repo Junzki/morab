@@ -6,7 +6,7 @@ const char end_needle = '.';
 
 auto
 takeout::extract_filename_from_url(const std::string& in,
-                                   const bool remove_ext) -> std::string
+                                   bool remove_ext) -> std::string
 {
     auto begin = 0;
     auto end = in.length() - 1;
@@ -36,7 +36,7 @@ takeout::extract_filename_from_url(const std::string& in,
 };
 
 void
-takeout::mkdir(const std::string& path, const bool exist_ok)
+takeout::mkdir(const std::string& path, bool exist_ok)
 {
 #ifdef WIN32
     const auto* path_name = path.c_str();
