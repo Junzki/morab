@@ -74,7 +74,7 @@ int main(const int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    url = "http://t66y.com/htm_mob/2101/8/4271499.html";
+    // Remove hard-coded URL, placeholder for future server_mode.
 
 	const auto res = takeout::morab::object().get_html(url);
 	auto results = takeout::extract_images(res);
