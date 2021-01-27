@@ -52,7 +52,17 @@ takeout::create_directory(const std::string& path, bool exist_ok)
         throw err;
     }
 #elif defined(__GENERIC_UNIX__)
-    if (0 != mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+    const auto path_ = path.c_str();
+    if (0 != mkdir(path_, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+        if (EEXIST == errno and exist_ok) {
+            struct stat stat_{};
+            stat(path_, &stat_);
+
+            // Check if target file is a directory.
+            if (S_ISDIR(stat_.st_mode))
+                return;
+        }
+
         throw errno;
     }  // mode: 0775
 #else
@@ -65,10 +75,36 @@ takeout::combine_path(const std::string& base,
                       const std::string& extra) -> std::string
 {
 #ifdef _WIN32
-    auto* buf = new char[MAX_PATH];
+    auto* buf = new char[max_path];
     const auto* result = PathCombineA(buf, base.c_str(), extra.c_str());
     return std::string(result);
 #else
     return base + path_sep + extra;
+#endif
+}
+
+void
+takeout::morab::change_directory(const std::string &path) {
+#ifdef _WIN32
+    // TODO: Implement under Win32
+#elif defined(__GENERIC_UNIX__)
+    if (0 != chdir(path.c_str())) {
+        throw errno;
+    }
+#endif
+}
+
+std::string
+takeout::morab::get_current_working_dir() {
+#ifdef _WIN32
+    // TODO:  Implement under Win32
+#elif defined(__GENERIC_UNIX__)
+    auto buf = new char[max_path];
+    getcwd(buf, max_path);
+
+    const auto cwd = std::string(buf);
+
+    delete[] buf;
+    return cwd;
 #endif
 }

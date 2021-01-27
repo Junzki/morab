@@ -52,15 +52,19 @@ int main(const int argc, char* argv[])
         }
 	}
 
-	std::cout << takeout::morab::object().settings().proxy_address() << std::endl;
+	if (!takeout::morab::object().settings().chdir().empty())
+	    takeout::morab::object().change_directory(takeout::morab::object().settings().chdir());
+
+    std::cout << "Working directory: " << takeout::morab::get_current_working_dir() << std::endl;
+	std::cout << "Proxy: " << takeout::morab::object().settings().proxy_address() << std::endl;
 
     std::string url;
     if (!server_mode) {
 #ifdef __GENERIC_UNIX__
         if (!isatty(STDIN_FILENO)) {
-            while (true) {
-                std::getline(std::cin, url);
-                if (url.empty()) break;
+            while (std::getline(std::cin, url)) {
+                if (url.empty())
+                    break;
 
                 std::cout << "Received Task: " << url << std::endl;
                 run_single(url);

@@ -32,6 +32,9 @@ namespace takeout
         std::string get_html(const std::string&) const;
         void download(const std::string&, const std::string&) const;
 
+        static std::string get_current_working_dir();
+        static void change_directory(const std::string &path);
+
         ThreadPool pool;
 
         ~morab() = default;

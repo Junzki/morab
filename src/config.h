@@ -18,38 +18,18 @@ namespace takeout
         config() = default;
         ~config() = default;
 
-        void read(const std::string& path)
-        {
-            std::ifstream f;
-            f.open(path, std::ios::in);
-
-            if (!f.is_open()) return;
-
-            std::ostringstream ss;
-            ss << f.rdbuf();
-
-            auto parsed = json::parse(ss.str());
-            this->proxy_ = parsed["proxy"];
-            this->proxy_address_ = parsed["proxy_address"];
-            //this->target_dir_ = parsed["target_dir"];
-        }
+        void read(const std::string&);
 
         auto proxy() const { return this->proxy_; }
         auto proxy_address() const { return this->proxy_address_; }
         auto user_agent() const { return this->user_agent_; }
-        auto target_dir() const
-        {
-            if (!this->target_dir_.empty())
-                return this->target_dir_;
-
-            return std::string();
-        }
+        auto chdir() const { return this->chdir_; }
 
     protected:
         bool proxy_ = false;
         std::string proxy_address_;
         std::string user_agent_ = default_user_agent;
-        std::string target_dir_;
+        std::string chdir_;
     };
 }
 

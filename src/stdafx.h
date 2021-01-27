@@ -35,6 +35,16 @@
 #include <sys/stat.h>
 #endif
 
+#if defined(__APPLE__)
+#include <sys/syslimits.h>
+constexpr const size_t max_path = PATH_MAX;
+#elif defined(__linux__)
+#include <linux/limits.h>
+constexpr const size_t max_path = PATH_MAX;
+#elif defined(_WIN32)
+constexpr const size_t max_path = MAX_PATH;  // From Windows.h
+#endif
+
 // cURLpp
 #include "curlpp/cURLpp.hpp"
 #include "curlpp/Easy.hpp"
