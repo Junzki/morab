@@ -30,27 +30,57 @@ void run_single(const std::string& url) {
 int main(const int argc, char* argv[])
 {
 	std::string path;
-	bool server_mode = false;
-	auto opt = -1;
+	auto server_mode = 0;
 
-	while ((opt = getopt(argc, argv, "c:d")) != -1)
-	{
+	auto opt = -1;
+    while (true) {
+        static struct option options[] = {
+            {"verbose", no_argument, nullptr, 'v'},
+            {"config", required_argument, nullptr, 'c'},
+            {"daemon", no_argument, nullptr, 'd'},
+            {nullptr, 0, nullptr, 0}
+        };
+        auto option_index = 0;
+
+        opt = getopt_long(argc, argv, "vc:d", options, &option_index);
+        if (-1 == opt)
+            break;
+
         switch (opt)
         {
-		case 'c':
-			path = std::string(optarg);
-			takeout::morab::object().setup(path);
-			std::cout << "Loaded config file from: " << path << std::endl;
+        case 0:
+            break;
 
-			break;
+        case 'v':
+            takeout::morab::object().set_verbose(true);
+            break;
+
+        case 'c':
+            path = std::string(optarg);
+            takeout::morab::object().setup(path);
+            std::cout << "Loaded config file from: " << path << std::endl;
+
+            break;
         case 'd':
             server_mode = true;
             break;
 
-		default:
-			break;
+        case '?':
+            break;
+
+        default:
+            abort();
         }
-	}
+    }
+
+    char* sources_list = nullptr;
+    if (optind < argc)  // Has additional non-option argv elements
+    {  
+        sources_list = argv[optind];
+        if (nullptr == sources_list) {
+            return EXIT_FAILURE;
+        }
+    }
 
 	if (!takeout::morab::object().settings().chdir().empty())
 	    takeout::morab::object().change_directory(takeout::morab::object().settings().chdir());
@@ -59,9 +89,17 @@ int main(const int argc, char* argv[])
 	std::cout << "Proxy: " << takeout::morab::object().settings().proxy_address() << std::endl;
 
     std::string url;
-    if (!server_mode) {
+    if ((!server_mode) && nullptr == sources_list) {
 #ifdef __GENERIC_UNIX__
-        if (!isatty(STDIN_FILENO)) {
+        if (!isatty(STDIN_FILENO)) {  // Not a console.
+#elif defined(_WIN32)
+        auto* const stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        if (INVALID_HANDLE_VALUE == stdin_handle)
+            return GetLastError();  // EXIT_FAILURE
+
+        if (FILE_TYPE_CHAR != GetFileType(stdin_handle))  // Not a console.
+        {
+#endif
             while (std::getline(std::cin, url)) {
                 if (url.empty())
                     break;
@@ -70,7 +108,23 @@ int main(const int argc, char* argv[])
                 run_single(url);
             }
         }
-#endif
+        return EXIT_SUCCESS;
+    }
+    else if (nullptr != sources_list) {
+        std::ifstream sources(sources_list);
+        if (!sources.is_open())
+            return EXIT_FAILURE;
+
+        std::cout << "Loaded sources from: " << sources_list << std::endl;
+
+        while (std::getline(sources, url)) {
+            if (url.empty())
+                break;
+
+            std::cout << "Received Task: " << url << std::endl;
+            run_single(url);
+        }
+
         return EXIT_SUCCESS;
     }
 

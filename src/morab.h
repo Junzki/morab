@@ -29,6 +29,8 @@ namespace takeout
             return this->config_;
         }
 
+        void set_verbose(const bool mode = true) { this->config_.set_verbose(mode); }
+
         std::string get_html(const std::string&) const;
         void download(const std::string&, const std::string&) const;
 
@@ -46,7 +48,7 @@ namespace takeout
         morab& operator=(const morab&&) = delete;
 
     protected:
-        cURLpp::Easy* build_requester() const;
+        void configure_requester(cURLpp::Easy&) const;
 
     private:
         morab() = default;

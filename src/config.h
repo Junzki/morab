@@ -25,11 +25,18 @@ namespace takeout
         auto user_agent() const { return this->user_agent_; }
         auto chdir() const { return this->chdir_; }
 
+        auto verbose() const { return this->verbose_; }
+        void set_verbose(const bool mode)
+        {
+            this->verbose_ = mode;
+        }
+
     protected:
         bool proxy_ = false;
         std::string proxy_address_;
         std::string user_agent_ = default_user_agent;
         std::string chdir_;
+        bool verbose_ = false;
     };
 }
 

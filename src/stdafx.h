@@ -49,6 +49,7 @@ constexpr const size_t max_path = MAX_PATH;  // From Windows.h
 #include "curlpp/cURLpp.hpp"
 #include "curlpp/Easy.hpp"
 #include "curlpp/Options.hpp"
+#include <curlpp/Infos.hpp>
 
 // LibXml
 #include "libxml/HTMLparser.h"

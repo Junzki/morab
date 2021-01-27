@@ -85,10 +85,16 @@ takeout::combine_path(const std::string& base,
 
 void
 takeout::morab::change_directory(const std::string &path) {
+    const auto* path_ = path.c_str();
+
 #ifdef _WIN32
-    // TODO: Implement under Win32
+    if (0 == SetCurrentDirectory(path_))
+    {
+        const auto err = GetLastError();
+        throw err;
+    }
 #elif defined(__GENERIC_UNIX__)
-    if (0 != chdir(path.c_str())) {
+    if (0 != chdir(path_)) {
         throw errno;
     }
 #endif
@@ -96,15 +102,19 @@ takeout::morab::change_directory(const std::string &path) {
 
 std::string
 takeout::morab::get_current_working_dir() {
+    auto* buf = new char[max_path];
+
 #ifdef _WIN32
-    // TODO:  Implement under Win32
+    if (0 == GetCurrentDirectory(max_path, buf))
+    {
+        const auto err = GetLastError();
+        throw err;
+    }
 #elif defined(__GENERIC_UNIX__)
-    auto buf = new char[max_path];
     getcwd(buf, max_path);
+#endif
 
-    const auto cwd = std::string(buf);
-
+    auto cwd = std::string(buf);
     delete[] buf;
     return cwd;
-#endif
 }
