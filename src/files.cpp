@@ -1,8 +1,9 @@
 
 #include "morab.h"
 
-const char begin_needle = '/';
+const char path_sep = '/';
 const char end_needle = '.';
+
 
 auto
 takeout::extract_filename_from_url(const std::string& in,
@@ -12,12 +13,12 @@ takeout::extract_filename_from_url(const std::string& in,
     auto end = in.length() - 1;
 
     auto tail = in.length();
-    if (begin_needle == in[tail - 1])
+    if (path_sep == in[tail - 1])
         tail -= 1;
 
     for (auto i = 0; i < tail; ++i)
     {
-        if (begin_needle == in[i])
+        if (path_sep == in[i])
             begin = i;
 
         if (end_needle == in[i])
@@ -36,9 +37,9 @@ takeout::extract_filename_from_url(const std::string& in,
 };
 
 void
-takeout::mkdir(const std::string& path, bool exist_ok)
+takeout::create_directory(const std::string& path, bool exist_ok)
 {
-#ifdef WIN32
+#ifdef _WIN32
     const auto* path_name = path.c_str();
     const auto result = CreateDirectoryA(path_name, nullptr);
 
@@ -50,6 +51,12 @@ takeout::mkdir(const std::string& path, bool exist_ok)
 
         throw err;
     }
+#elif defined(__GENERIC_UNIX__)
+    if (0 != mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) {
+        throw errno;
+    }  // mode: 0775
+#else
+    throw "Cannot create directory, method not implmented.";
 #endif
 }
 
@@ -57,13 +64,11 @@ auto
 takeout::combine_path(const std::string& base,
                       const std::string& extra) -> std::string
 {
-#ifdef WIN32
+#ifdef _WIN32
     auto* buf = new char[MAX_PATH];
-
     const auto* result = PathCombineA(buf, base.c_str(), extra.c_str());
-
     return std::string(result);
 #else
-    return std::string();
+    return base + path_sep + extra;
 #endif
 }

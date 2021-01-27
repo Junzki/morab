@@ -8,12 +8,32 @@
 #endif
 
 
+void run_single(const std::string& url) {
+    const auto res = takeout::morab::object().get_html(url);
+    auto results = takeout::extract_images(res);
+
+    const auto fn = takeout::extract_filename_from_url(url, true);
+    std::cout << "Target Directory: " << fn << std::endl;
+
+    takeout::create_directory(fn, true);
+
+    for (const auto& image_url : results)
+    {
+        const auto name = takeout::extract_filename_from_url(image_url);
+        const auto joined = takeout::combine_path(fn, name);
+        takeout::morab::object().download(image_url, joined);
+        std::cout << "Downloaded: " << image_url << std::endl;
+    }
+}
+
+
 int main(const int argc, char* argv[])
 {
 	std::string path;
+	bool server_mode = false;
 	auto opt = -1;
 
-	while ((opt = getopt(argc, argv, "c:")) != -1)
+	while ((opt = getopt(argc, argv, "c:d")) != -1)
 	{
         switch (opt)
         {
@@ -23,6 +43,10 @@ int main(const int argc, char* argv[])
 			std::cout << "Loaded config file from: " << path << std::endl;
 
 			break;
+        case 'd':
+            server_mode = true;
+            break;
+
 		default:
 			break;
         }
@@ -30,14 +54,31 @@ int main(const int argc, char* argv[])
 
 	std::cout << takeout::morab::object().settings().proxy_address() << std::endl;
 
-    const std::string url = "http://t66y.com/htm_mob/2101/8/4271499.html";
+    std::string url;
+    if (!server_mode) {
+#ifdef __GENERIC_UNIX__
+        if (!isatty(STDIN_FILENO)) {
+            while (true) {
+                std::getline(std::cin, url);
+                if (url.empty()) break;
+
+                std::cout << "Received Task: " << url << std::endl;
+                run_single(url);
+            }
+        }
+#endif
+        return EXIT_SUCCESS;
+    }
+
+    url = "http://t66y.com/htm_mob/2101/8/4271499.html";
+
 	const auto res = takeout::morab::object().get_html(url);
 	auto results = takeout::extract_images(res);
 
 	const auto fn = takeout::extract_filename_from_url(url, true);
 	std::cout << "Target Directory: " << fn << std::endl;
 
-	takeout::mkdir(fn, true);
+    takeout::create_directory(fn, true);
 
 	for (const auto& image_url : results)
 	{
@@ -53,5 +94,5 @@ int main(const int argc, char* argv[])
 		// TODO: Wait futures.
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

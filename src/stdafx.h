@@ -32,6 +32,7 @@
 #if defined(unix) || defined(__APPLE__) || defined(__linux__)
 #define __GENERIC_UNIX__
 #include <unistd.h>
+#include <sys/stat.h>
 #endif
 
 // cURLpp
