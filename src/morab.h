@@ -61,6 +61,8 @@ namespace takeout
     std::string extract_filename_from_url(const std::string& in, bool remove_ext = false);
     void create_directory(const std::string& path, bool exist_ok = false);
     std::string combine_path(const std::string&, const std::string&);
+
+    bool is_url(const std::string&);
 }
 
 

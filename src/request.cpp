@@ -5,9 +5,11 @@
 void
 takeout::morab::configure_requester(cURLpp::Easy& request) const
 {
-
     request.setOpt(new curlpp::options::FollowLocation(true));
     request.setOpt(new curlpp::options::UserAgent(this->config_.user_agent()));
+
+    request.setOpt(new cURLpp::options::Timeout(this->config_.read_timeout()));
+
     if (this->config_.proxy())
         request.setOpt(new cURLpp::options::Proxy(this->config_.proxy_address()));
 

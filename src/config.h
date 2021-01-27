@@ -31,12 +31,15 @@ namespace takeout
             this->verbose_ = mode;
         }
 
+        auto read_timeout() const { return this->read_timeout_;  }
+
     protected:
         bool proxy_ = false;
         std::string proxy_address_;
         std::string user_agent_ = default_user_agent;
         std::string chdir_;
         bool verbose_ = false;
+        unsigned int read_timeout_ = 60;  // 1 minute by default;
     };
 }
 

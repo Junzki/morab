@@ -73,12 +73,17 @@ int main(const int argc, char* argv[])
         }
     }
 
-    char* sources_list = nullptr;
+    std::vector<std::string> sources;
     if (optind < argc)  // Has additional non-option argv elements
-    {  
-        sources_list = argv[optind];
-        if (nullptr == sources_list) {
-            return EXIT_FAILURE;
+    {
+        while (optind < argc)
+        {
+            const auto* src = argv[optind];
+            if (nullptr == src)
+                continue;
+
+            sources.push_back(std::string(src));
+            optind++;
         }
     }
 
@@ -88,8 +93,10 @@ int main(const int argc, char* argv[])
     std::cout << "Working directory: " << takeout::morab::get_current_working_dir() << std::endl;
 	std::cout << "Proxy: " << takeout::morab::object().settings().proxy_address() << std::endl;
 
+    std::vector<std::string> tasks;
+
     std::string url;
-    if ((!server_mode) && nullptr == sources_list) {
+    if ((!server_mode) && sources.empty()) {
 #ifdef __GENERIC_UNIX__
         if (!isatty(STDIN_FILENO)) {  // Not a console.
 #elif defined(_WIN32)
@@ -104,53 +111,40 @@ int main(const int argc, char* argv[])
                 if (url.empty())
                     break;
 
-                std::cout << "Received Task: " << url << std::endl;
-                run_single(url);
+                tasks.push_back(url);
             }
         }
-        return EXIT_SUCCESS;
     }
-    else if (nullptr != sources_list) {
-        std::ifstream sources(sources_list);
-        if (!sources.is_open())
-            return EXIT_FAILURE;
+    else if (! sources.empty()) {
+        for (const auto& source : sources)
+        {
+            if (takeout::is_url(source))
+            {
+                tasks.push_back(source);
+                continue;
+            }
 
-        std::cout << "Loaded sources from: " << sources_list << std::endl;
+            std::ifstream f(source);
+            if (!f.is_open())
+                return EXIT_FAILURE;
 
-        while (std::getline(sources, url)) {
-            if (url.empty())
-                break;
+            std::cout << "Loaded sources from: " << source << std::endl;
 
-            std::cout << "Received Task: " << url << std::endl;
-            run_single(url);
+            while (std::getline(f, url)) {
+                if (url.empty())
+                    break;
+
+                tasks.push_back(url);
+            }
+
+
         }
-
-        return EXIT_SUCCESS;
     }
 
-    // Remove hard-coded URL, placeholder for future server_mode.
+    for (const auto& task : tasks) {
+        std::cout << "Received Task: " << task << std::endl;
+        run_single(task);
+    }
 
-	const auto res = takeout::morab::object().get_html(url);
-	auto results = takeout::extract_images(res);
-
-	const auto fn = takeout::extract_filename_from_url(url, true);
-	std::cout << "Target Directory: " << fn << std::endl;
-
-    takeout::create_directory(fn, true);
-
-	for (const auto& image_url : results)
-	{
-		const auto name = takeout::extract_filename_from_url(image_url);
-		const auto joined = takeout::combine_path(fn, name);
-
-		auto future = takeout::morab::object().pool.submit([](const std::string url_, const std::string path_)
-		{
-		    takeout::morab::object().download(url_, path_);
-			std::cout << "Downloaded: " << url_ << std::endl;
-		}, image_url, joined);
-
-		// TODO: Wait futures.
-	}
-
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
