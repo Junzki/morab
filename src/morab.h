@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "config.h"
+#include "session.h"
 
 namespace takeout
 {

@@ -19,9 +19,12 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 #include <regex>
+#include <map>
 
 #include <nlohmann/json.hpp>
 
@@ -33,6 +36,7 @@
 #if defined(unix) || defined(__APPLE__) || defined(__linux__)
 #define __GENERIC_UNIX__
 #include <unistd.h>
+#include <getopt.h>
 #include <sys/stat.h>
 #endif
 
@@ -51,6 +55,7 @@ constexpr const size_t max_path = MAX_PATH;  // From Windows.h
 #include "curlpp/Easy.hpp"
 #include "curlpp/Options.hpp"
 #include <curlpp/Infos.hpp>
+#include <curlpp/Exception.hpp>
 
 // LibXml
 #include "libxml/HTMLparser.h"

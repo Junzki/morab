@@ -35,9 +35,9 @@ int main(const int argc, char* argv[])
 	auto opt = -1;
     while (true) {
         static struct option options[] = {
-            {"verbose", no_argument, nullptr, 'v'},
-            {"config", required_argument, nullptr, 'c'},
-            {"daemon", no_argument, nullptr, 'd'},
+            {"verbose", no_argument,       nullptr, 'v'},
+            {"config",  required_argument, nullptr, 'c'},
+            {"daemon",  no_argument,       nullptr, 'd'},
             {nullptr, 0, nullptr, 0}
         };
         auto option_index = 0;
@@ -82,7 +82,7 @@ int main(const int argc, char* argv[])
             if (nullptr == src)
                 continue;
 
-            sources.push_back(std::string(src));
+            sources.emplace_back(src);
             optind++;
         }
     }
