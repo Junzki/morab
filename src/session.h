@@ -43,6 +43,26 @@ namespace takeout {
             this->headers_.push_back(ss.str());
         }
 
+        void set_cookie(const cookie& c) {
+            if (c.empty())
+                return;
+
+            this->cookies_.insert(std::pair<std::string, cookie>(c.key, c));
+        }
+
+        void set_cookie(const std::string& in) {
+            if (in.empty())
+                return;
+
+            cookie c;
+            c.parse(in);
+
+            if (c.empty())
+                return;
+
+            this->cookies_.insert(std::pair<std::string, cookie>(c.key, c));
+        }
+
 
     protected:
         void configure_requester(cURLpp::Easy& easy) const {
@@ -64,7 +84,7 @@ namespace takeout {
 
             // Cookies
             for (auto it = this->cookies_.begin(); it != cookies_.end(); ++it) {
-                easy.setOpt(cURLpp::options::CookieList(*it));
+                easy.setOpt(cURLpp::options::CookieList(it->second.str()));
             }
         }
 
@@ -75,7 +95,7 @@ namespace takeout {
         std::string user_agent_ = default_user_agent;
 
         std::list<std::string> headers_;
-        std::list<std::string> cookies_;
+        std::map<std::string, cookie> cookies_;
     };
 }
 

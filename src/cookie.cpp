@@ -53,3 +53,9 @@ cookie::str() const {
 
     return ss.str();
 }
+
+
+void
+cookie::parse(const std::string& in) {
+    // TODO: Implement "parse" method.
+}

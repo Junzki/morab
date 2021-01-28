@@ -181,6 +181,11 @@ public:
     cookie() = default;
 
     std::string str() const;
+    void parse(const std::string&);
+
+    bool empty() const {
+        return valid_cookie_name(this->key);
+    }
 
 protected:
     char raw_expires_[UTC_DATETIME_SIZE];
