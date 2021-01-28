@@ -181,7 +181,6 @@ public:
     cookie() = default;
 
     std::string str() const;
-    std::string set_cookie() const;
 
 protected:
     char raw_expires_[UTC_DATETIME_SIZE];

@@ -53,11 +53,3 @@ cookie::str() const {
 
     return ss.str();
 }
-
-std::string
-cookie::set_cookie() const {
-    std::ostringstream oss;
-    oss << "Set-Cookie: " << this->str();
-
-    return oss.str();
-}
