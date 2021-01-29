@@ -14,7 +14,7 @@
 #ifndef MORAB_STDAFX_H
 #define MORAB_STDAFX_H
 
-
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <regex>
 #include <map>
+#include <signal.h>
 
 #include <nlohmann/json.hpp>
 
