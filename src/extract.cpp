@@ -20,7 +20,7 @@ auto to_string(xmlChar* in)
 void
 search_element(xmlNode* entry, std::vector<std::string>& results)
 {
-    auto* target_attr = default_src_attr;
+    auto* target_attr = ess_attr;
     for (auto* current = entry; current; current = current->next)
     {
         if (XML_ELEMENT_NODE == current->type && \

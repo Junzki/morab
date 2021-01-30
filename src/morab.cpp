@@ -28,15 +28,25 @@ run_single(const std::string& url) {
 
     takeout::create_directory(fn, true);
 
+    std::list<std::future<std::thread::id>> futures;
     for (auto& image_url : results)
     {
         clean_url(image_url);
         const auto name = takeout::extract_filename_from_url(image_url);
         const auto joined = takeout::combine_path(fn, name);
-        takeout::morab::object().download(image_url, joined);
-        std::cout << "Downloaded: " << image_url << std::endl;
+
+        futures.emplace_back(takeout::morab::object().pool.submit([=]{
+            takeout::morab::object().download(image_url, joined);
+            std::cout << "Downloaded: " << image_url << std::endl;
+            return std::this_thread::get_id();
+        }));
     }
 
+    for (auto& future : futures) {
+        future.wait();
+    }
+
+    std::cout << "Task: " << url << " completed already." << std::endl;
     return std::this_thread::get_id();
 }
 

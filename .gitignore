@@ -45,6 +45,9 @@ CTestTestfile.cmake
 _deps
 CMakeSettings.json
 
+# macOS
+.DS_Store
+
 # Local
 .vs/
 .vscode/
