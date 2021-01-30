@@ -7,7 +7,15 @@
 #include "wgetopt.hpp"
 #endif
 
-std::atomic_int exit_flag = 1;
+std::atomic_int exit_flag;
+std::thread server_thread;
+
+
+void clean_url(std::string& url) {
+    if (url.find("//") == 0) {
+        url.insert(0, "http:");
+    }
+}
 
 
 std::thread::id
@@ -20,8 +28,9 @@ run_single(const std::string& url) {
 
     takeout::create_directory(fn, true);
 
-    for (const auto& image_url : results)
+    for (auto& image_url : results)
     {
+        clean_url(image_url);
         const auto name = takeout::extract_filename_from_url(image_url);
         const auto joined = takeout::combine_path(fn, name);
         takeout::morab::object().download(image_url, joined);
@@ -71,6 +80,7 @@ spawn_stdin()
 
 int main(const int argc, char* argv[])
 {
+    ++exit_flag;
     signal(SIGINT, handle_exit);
 
 	std::string path;
@@ -138,7 +148,7 @@ int main(const int argc, char* argv[])
     // Emit tasks.
     std::list<std::future<std::thread::id>> futures;
     if (server_mode && sources.empty()) {
-        futures.emplace_back(takeout::morab::object().pool.submit(spawn_stdin));
+        server_thread = std::thread(spawn_stdin);
     }
     else if (! sources.empty()) {
         std::string url;
@@ -169,7 +179,9 @@ int main(const int argc, char* argv[])
         }
     }
 
-    handle_exit(SIGINT);
+    if (server_thread.joinable())
+        server_thread.join();
+
     for (auto& future : futures)
     {
         future.wait();

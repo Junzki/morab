@@ -4,7 +4,8 @@
 
 
 const auto* target_tag  = (const xmlChar*)"img";
-const auto* target_attr = (const xmlChar*)"ess-data";
+const auto* ess_attr = (const xmlChar*)"ess-data";
+const auto* default_src_attr = (const xmlChar*)"src";
 
 
 auto to_string(xmlChar* in)
@@ -19,9 +20,9 @@ auto to_string(xmlChar* in)
 void
 search_element(xmlNode* entry, std::vector<std::string>& results)
 {
+    auto* target_attr = default_src_attr;
     for (auto* current = entry; current; current = current->next)
     {
-
         if (XML_ELEMENT_NODE == current->type && \
             xmlStrEqual(target_tag, current->name) && \
             nullptr != xmlHasProp(current, target_attr))
@@ -49,7 +50,7 @@ takeout::extract_images(const std::string& content)
 
     std::vector<std::string> results;
 
-    search_element(entry->last, results);
+    search_element(entry, results);
     xmlFreeDoc(doc);
     return results;
 }

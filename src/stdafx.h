@@ -25,7 +25,13 @@
 #include <algorithm>
 #include <regex>
 #include <map>
+#include <atomic>
+
+#ifdef _WIN32
 #include <signal.h>
+#else
+#include <csignal>
+#endif
 
 #include <nlohmann/json.hpp>
 
