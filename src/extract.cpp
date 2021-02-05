@@ -1,5 +1,4 @@
 
-
 #include "morab.h"
 
 
@@ -29,9 +28,6 @@ search_element(xmlNode* entry, std::vector<std::string>& results)
         {
             for (const auto* attr : attrs)
             {
-//                if (nullptr == xmlHasProp(current, attr))
-//                    continue;
-
                 auto *value = xmlGetProp(current, attr);
                 if (nullptr == value)
                     continue;
