@@ -64,6 +64,7 @@ namespace takeout
     std::string combine_path(const std::string&, const std::string&);
 
     bool is_url(const std::string&);
+    void clean_url(std::string&);
 }
 
 

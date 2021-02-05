@@ -122,10 +122,17 @@ takeout::morab::get_current_working_dir() {
 
 bool takeout::is_url(const std::string& uri)
 {
-    static const std::regex url_regex("(http|https)://([^/ :]+):?([^/ ]*)(/?[^ #?]*)\\x3f?([^ #]*)#?([^ ]*)");
+    static const std::regex url_regex("((http|https):)?//([^/ :]+):?([^/ ]*)(/?[^ #?]*)\\x3f?([^ #]*)#?([^ ]*)");
 
     std::smatch match;
     std::regex_match(uri, match, url_regex);
 
     return (!match.empty());
+}
+
+
+void takeout::clean_url(std::string& url) {
+    if (url.find("//") == 0) {
+        url.insert(0, "http:");
+    }
 }

@@ -11,11 +11,7 @@ std::atomic_int exit_flag;
 std::thread server_thread;
 
 
-void clean_url(std::string& url) {
-    if (url.find("//") == 0) {
-        url.insert(0, "http:");
-    }
-}
+
 
 
 std::thread::id
@@ -31,7 +27,6 @@ run_single(const std::string& url) {
     std::list<std::future<std::thread::id>> futures;
     for (auto& image_url : results)
     {
-        clean_url(image_url);
         const auto name = takeout::extract_filename_from_url(image_url);
         const auto joined = takeout::combine_path(fn, name);
 

@@ -32,7 +32,6 @@ takeout::morab::get_html(const std::string& url) const
     req.perform();
 
     auto response = out_stream.str();
-    std::cout << response << std::endl;
     return response;
 }
 
