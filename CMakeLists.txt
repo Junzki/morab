@@ -21,8 +21,14 @@ target_link_libraries(${MORAB_CLI} PRIVATE ${TARGET_LIBRARIES})
 # Server
 set(MORAB_SERVER "morab-server")
 file(GLOB_RECURSE ${MORAB_SERVER}_FILES "${PROJECT_SOURCE_DIR}/server/*.cpp")
+
+set(${MORAB_SERVER}_LIBRARIES ${TARGET_LIBRARIES})
+if(WIN32)
+list(APPEND ${MORAB_SERVER}_LIBRARIES "wsock32" "Ws2_32")
+endif()
+
 add_executable(${MORAB_SERVER} ${${MORAB_SERVER}_FILES})
-target_link_libraries(${MORAB_SERVER} PRIVATE ${TARGET_LIBRARIES})
+target_link_libraries(${MORAB_SERVER} PRIVATE ${${MORAB_SERVER}_LIBRARIES})
 
 # Tests
 if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
