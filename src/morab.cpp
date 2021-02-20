@@ -11,9 +11,6 @@ std::atomic_int exit_flag;
 std::thread server_thread;
 
 
-
-
-
 std::thread::id
 run_single(const std::string& url) {
     const auto res = takeout::morab::object().get_html(url);
@@ -100,7 +97,7 @@ int main(const int argc, char* argv[])
         };
         auto option_index = 0;
 
-        opt = getopt_long(argc, argv, "vc:d", options, &option_index);
+        opt = getopt_long(argc, argv, "vc:", options, &option_index);
         if (-1 == opt)
             break;
 
@@ -137,7 +134,7 @@ int main(const int argc, char* argv[])
             if (nullptr == src)
                 continue;
 
-            sources.emplace_back(src);
+            sources.push_back(src);
             server_mode = 0;
             optind++;
         }
@@ -150,19 +147,26 @@ int main(const int argc, char* argv[])
     std::cout << "Working directory: " << takeout::morab::get_current_working_dir() << std::endl;
 	std::cout << "Proxy: " << takeout::morab::object().settings().proxy_address() << std::endl;
 
+#ifdef __GENERIC_UNIX__
+	struct stat st;
+	fstat(STDIN_FILENO, &st);
+
+	if (S_ISFIFO(st.st_mode)) {}
+#endif
+
     // Emit tasks.
     std::list<std::future<std::thread::id>> futures;
     if (server_mode && sources.empty()) {
         server_thread = std::thread(spawn_stdin);
     }
-    else if (! sources.empty()) {
+    else if (! sources.empty()) {  // TODO: Determine if stdin is tty or redirected from file or pipe.
         std::string url;
         for (const auto& source : sources)
         {
             if (takeout::is_url(source))
             {
                 std::cout << "Received Task: " << source << std::endl;
-                futures.emplace_back(takeout::morab::object().pool.submit(run_single, source));
+                futures.push_back(takeout::morab::object().pool.submit(run_single, source));
             }
 
             std::ifstream f(source);
@@ -179,7 +183,7 @@ int main(const int argc, char* argv[])
                     break;
 
                 std::cout << "Received Task: " << source << std::endl;
-                futures.emplace_back(takeout::morab::object().pool.submit(run_single, source));
+                futures.push_back(takeout::morab::object().pool.submit(run_single, source));
             }
         }
     }
